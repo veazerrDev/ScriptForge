@@ -1,0 +1,96 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.sep {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  margin: 0 6px;
+}
+
+.btn {
+  width: 30px; height: 30px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  transition: all 0.12s;
+}
+.btn:hover { background: var(--surface2); color: var(--text); border-color: var(--border); }
+.btn.active {
+  background: var(--surface2);
+  color: var(--text);
+  border-color: var(--accent-b);
+  box-shadow: 0 0 0 1px var(--accent-b) inset;
+}
+
+.select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-family: var(--font-ui);
+  outline: none;
+  cursor: pointer;
+  height: 30px;
+  min-width: 130px;
+  transition: border-color 0.12s;
+}
+.select:hover { border-color: var(--text-muted); }
+
+.selectSmall {
+  composes: select;
+  min-width: 60px;
+  width: 60px;
+}
+
+/* Roll buttons */
+.tagBtn {
+  height: 30px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.12s;
+  position: relative;
+  overflow: hidden;
+}
+.tagBtn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.08);
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+.tagBtn:hover::after { opacity: 1; }
+.tagBtn:active { transform: scale(0.96); }
+
+.aroll  { background: #3d1a12; color: var(--accent-a); border: 1px solid #6b2d1f; }
+.broll  { background: #12183d; color: #7b96ff; border: 1px solid #2a3670; }
+.motion { background: #25113d; color: #d17bff; border: 1px solid #4a2270; }
