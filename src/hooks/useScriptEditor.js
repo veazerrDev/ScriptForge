@@ -4,10 +4,25 @@ import { exportAsText } from "../utils/exportAsText";
 
 export function useScriptEditor() {
   const editorRef = useRef(null);
-  const [activeFormats, setActiveFormats] = useState({ bold: false, italic: false, underline: false });
+  const [activeFormats, setActiveFormats] = useState({
+    bold: false,
+    italic: false,
+    underline: false,
+  });
   const [fontSize, setFontSizeState] = useState(16);
-  const [fontFamily, setFontFamilyState] = useState("Instrument Sans, sans-serif");
+  const [fontFamily, setFontFamilyState] = useState(
+    "Instrument Sans, sans-serif",
+  );
   const [sections, setSections] = useState([]);
+
+  // ── завантажуємо збережений контент при старті ──
+  useEffect(() => {
+    const saved = localStorage.getItem("scriptforge_content");
+    if (saved && editorRef.current) {
+      editorRef.current.innerHTML = saved;
+      setSections(parseSections(editorRef.current));
+    }
+  }, []);
 
   /* ── helpers ── */
   const exec = (cmd, val = null) => {
@@ -17,8 +32,8 @@ export function useScriptEditor() {
 
   const updateFormats = useCallback(() => {
     setActiveFormats({
-      bold:      document.queryCommandState("bold"),
-      italic:    document.queryCommandState("italic"),
+      bold: document.queryCommandState("bold"),
+      italic: document.queryCommandState("italic"),
       underline: document.queryCommandState("underline"),
     });
   }, []);
@@ -31,20 +46,19 @@ export function useScriptEditor() {
   /* ── content change → parse sections ── */
   const handleChange = useCallback(() => {
     if (!editorRef.current) return;
+    localStorage.setItem("scriptforge_content", editorRef.current.innerHTML);
     setSections(parseSections(editorRef.current));
   }, []);
 
   /* ── formatting ── */
-  const toggleBold      = () => exec("bold");
-  const toggleItalic    = () => exec("italic");
+  const toggleBold = () => exec("bold");
+  const toggleItalic = () => exec("italic");
   const toggleUnderline = () => exec("underline");
 
   const setFontSize = (size) => {
     setFontSizeState(Number(size));
-    // execCommand fontSize only accepts 1-7 — use a span workaround
     exec("styleWithCSS", true);
-    exec("fontSize", 3); // placeholder
-    // override the size on the created font tag
+    exec("fontSize", 3);
     const sel = window.getSelection();
     if (!sel || sel.isCollapsed) return;
     const range = sel.getRangeAt(0);
@@ -95,7 +109,6 @@ export function useScriptEditor() {
       range.deleteContents();
       range.insertNode(block);
     } else {
-      // insert at cursor or append
       if (sel && sel.rangeCount > 0) {
         const range = sel.getRangeAt(0);
         range.insertNode(block);
@@ -104,19 +117,17 @@ export function useScriptEditor() {
       }
     }
 
-    // place cursor after block
     const newRange = document.createRange();
     newRange.setStartAfter(block);
     newRange.collapse(true);
     sel?.removeAllRanges();
     sel?.addRange(newRange);
 
-    // update sections
     setSections(parseSections(editor));
   }, []);
 
-  const insertARoll  = () => insertSection("aroll");
-  const insertBRoll  = () => insertSection("broll");
+  const insertARoll = () => insertSection("aroll");
+  const insertBRoll = () => insertSection("broll");
   const insertMotion = () => insertSection("motion");
 
   /* ── jump to section ── */
