@@ -1,6 +1,7 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import { parseSections } from "../utils/parseSections";
-import { exportAsText } from "../utils/exportAsText";
+import { exportAsText, exportAsJson } from "../utils/exportAsText";
+import { importFromFile } from "../utils/importFromFile";
 
 export function useScriptEditor() {
   const editorRef = useRef(null);
@@ -14,6 +15,7 @@ export function useScriptEditor() {
     "Instrument Sans, sans-serif",
   );
   const [sections, setSections] = useState([]);
+  const [importError, setImportError] = useState(null);
 
   // ── завантажуємо збережений контент при старті ──
   useEffect(() => {
@@ -142,12 +144,40 @@ export function useScriptEditor() {
     exportAsText(editorRef.current.innerText);
   }, []);
 
+  const handleExportJson = useCallback((title) => {
+    if (!editorRef.current) return;
+    exportAsJson(title, editorRef.current.innerHTML);
+  }, []);
+
+  /* ── import ──
+   * Reads the chosen file, replaces the editor content with the
+   * recognized text/structure, and returns the recognized title (if any)
+   * so the caller (App) can update the project title state.
+   */
+  const handleImport = useCallback(async (file) => {
+    setImportError(null);
+    try {
+      const result = await importFromFile(file);
+      if (!editorRef.current) return null;
+
+      editorRef.current.innerHTML = result.html;
+      localStorage.setItem("scriptforge_content", result.html);
+      setSections(parseSections(editorRef.current));
+
+      return result.title || null;
+    } catch (err) {
+      setImportError(err.message || "Не вдалося імпортувати файл.");
+      return null;
+    }
+  }, []);
+
   return {
     editorRef,
     activeFormats,
     fontSize,
     fontFamily,
     sections,
+    importError,
     toggleBold,
     toggleItalic,
     toggleUnderline,
@@ -162,5 +192,7 @@ export function useScriptEditor() {
     handleChange,
     jumpToSection,
     handleExport,
+    handleExportJson,
+    handleImport,
   };
 }

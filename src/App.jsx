@@ -19,6 +19,9 @@ export default function App() {
         onToggleSidebar={() => setSidebarOpen((v) => !v)}
         sidebarOpen={sidebarOpen}
         onExport={editor.handleExport}
+        onExportJson={editor.handleExportJson}
+        onImport={editor.handleImport}
+        importError={editor.importError}
       />
       <div className="app-body">
         <Toolbar
